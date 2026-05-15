@@ -8,7 +8,7 @@ import sample.common.dao.entity.Task;
 @Mapper
 public interface TaskMapper {
     
-    // 特定のユーザーのタスクを「ページ指定」で取得する（ページネーション用）
+    // 特定のユーザーのタスクを「ページ指定」で取得する
     List<Task> findPageByUserId(@Param("userId") Long userId, 
                                 @Param("offset") int offset, 
                                 @Param("limit") int limit);
@@ -31,6 +31,6 @@ public interface TaskMapper {
     // タスクを更新する
     void update(Task task);
 
-    // タスクを削除（論理削除）する
+    // タスクを削除（物理削除）する
     void delete(@Param("id") Long id);
 }
