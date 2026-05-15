@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODOアプリ TOP</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            background-color: #f8f9fa;
+        }
+        h1 { margin-bottom: 30px; font-size: 2rem; color: #333; }
+        .button-container {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+            max-width: 400px;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+        .btn {
+            flex: 1; /* ボタンを均等な幅にする */
+            padding: 15px 0;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-register { background-color: #5a9167; }
+        .btn-login { background-color: #4c84ff; }
+
+        /* スマホ対応：ボタンを縦並びにする */
+        @media (max-width: 480px) {
+            .button-container { flex-direction: column; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>TODOアプリ TOP</h1>
+
+    <div class="button-container">
+        <a th:href="@{/register}" class="btn btn-register">ユーザ登録</a>
+        <a th:href="@{/login}" class="btn btn-login">ログイン</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sample.common.dao.mapper.TaskMapper">
+
+    <select id="findPageByUserId" resultType="sample.common.dao.entity.Task">
+        SELECT 
+            id, 
+            user_id AS userId, 
+            title, 
+            content, 
+            name, 
+            start_date AS startDate, 
+            end_date AS endDate, 
+            created_at AS createdAt, 
+            updated_at AS updatedAt
+        FROM tasks 
+        WHERE user_id = #{userId} AND delete_flg = 0
+        ORDER BY created_at DESC 
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*) FROM tasks WHERE user_id = #{userId} AND delete_flg = 0
+    </select>
+
+    <select id="findByUserId" resultType="sample.common.dao.entity.Task">
+        SELECT 
+            id, 
+            user_id AS userId, 
+            title, 
+            content, 
+            name, 
+            start_date AS startDate, 
+            end_date AS endDate, 
+            created_at AS createdAt, 
+            updated_at AS updatedAt
+        FROM tasks 
+        WHERE user_id = #{userId} AND delete_flg = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <insert id="insert" parameterType="sample.common.dao.entity.Task">
+        INSERT INTO tasks (
+            user_id, title, content, name, start_date, end_date
+        ) VALUES (
+            #{userId}, #{title}, #{content}, #{name}, #{startDate}, #{endDate}
+        )
+    </insert>
+	
+    <select id="findById" resultType="sample.common.dao.entity.Task">
+        SELECT id, user_id AS userId, title, content, name, 
+               start_date AS startDate, end_date AS endDate
+        FROM tasks WHERE id = #{id} AND delete_flg = 0
+    </select>
+	
+    <update id="update" parameterType="sample.common.dao.entity.Task">
+        UPDATE tasks SET
+            title = #{title},
+            content = #{content},
+            name = #{name},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE tasks SET 
+            delete_flg = 1, 
+            updated_at = CURRENT_TIMESTAMP 
+        WHERE id = #{id}
+    </update>
+	
+</mapper>
