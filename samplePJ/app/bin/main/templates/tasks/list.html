@@ -149,7 +149,13 @@
         </ul>
     </div>
 
-    <a href="/tasks/new" class="btn-new">+ 新規作成</a>
+	<div style="text-align: right; margin-top: 20px;">
+	    <form th:action="@{/logout}" method="post" style="display: inline;">
+	        <button type="submit" class="btn-red" style="padding: 10px 20px; border: none; cursor: pointer;">← ログアウト</button>
+	    </form>
+	</div>
 
-</body>
-</html>
+	    <a href="/tasks/new" class="btn-new">+ 新規作成</a>
+
+	</body>
+	</html>

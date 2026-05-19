@@ -37,12 +37,18 @@ public class TaskController {
     public String list(
             @RequestParam(name = "page", defaultValue = "1") int page, 
             Model model, 
-            HttpSession session) {
+            HttpSession session,
+            jakarta.servlet.http.HttpServletResponse response) { // ★引数に response を追加！
         
         Long loginUserId = (Long) session.getAttribute("userId");
         if (loginUserId == null) {
             return "redirect:/login";
         }
+        
+        // 🛠️ ブラウザに「キャッシュを保存するな！」と命令するおまじない
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
         
         int pageSize = 10;
         List<Task> tasks = taskService.findPageByUserId(loginUserId, page, pageSize); 
