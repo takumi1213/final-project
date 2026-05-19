@@ -79,9 +79,13 @@ public class TaskController {
      */
     @GetMapping("/tasks/edit/{id}")
     public String edit(@PathVariable("id") Long id, Model model, HttpSession session) {
-        if (session.getAttribute("userId") == null) return "redirect:/login";
+        // ログインチェックと同時に、ログインユーザーのIDを取得
+        Long loginUserId = (Long) session.getAttribute("userId");
+        if (loginUserId == null) return "redirect:/login";
 
-        Task task = taskService.findById(id);
+        // ★修正：新しく作った「ユーザー検証付き」のメソッドを呼ぶ
+        // 他人のタスクIDを指定されたら、サービス層で自動的に例外（エラー）が飛ぶぜ！
+        Task task = taskService.findByIdForUser(id, loginUserId);
         model.addAttribute("task", task);
         return "tasks/edit"; // 編集用のHTML
     }
@@ -91,17 +95,26 @@ public class TaskController {
      */
     @PostMapping("/tasks/update")
     public String update(Task task, HttpSession session) {
-        if (session.getAttribute("userId") == null) return "redirect:/login";
+        Long loginUserId = (Long) session.getAttribute("userId");
+        if (loginUserId == null) return "redirect:/login";
         
-        taskService.update(task);
+        // ★修正：新しく作った「ユーザー検証付き」のメソッドを呼ぶ
+        // これで画面の書き換え攻撃（不正なuserIdの送りつけ）も完全に無効化するぜ
+        taskService.updateForUser(task, loginUserId);
         return "redirect:/tasks";
     }
     
+    /**
+     * 削除を実行する（※GETメソッドの危険性はP0-03で直すから、まずはIDOR対策だけ！）
+     */
     @GetMapping("/tasks/delete/{id}")
     public String delete(@PathVariable("id") Long id, HttpSession session) {
-        if (session.getAttribute("userId") == null) return "redirect:/login";
+        Long loginUserId = (Long) session.getAttribute("userId");
+        if (loginUserId == null) return "redirect:/login";
         
-        taskService.delete(id);
+        // ★修正：新しく作った「ユーザー検証付き」のメソッドを呼ぶ
+        // これでURLの数字をテキトーに変えて他人のタスクを消す悪戯は不可能になるぜ
+        taskService.deleteForUser(id, loginUserId);
         return "redirect:/tasks"; // 削除後は一覧へ
     }
     

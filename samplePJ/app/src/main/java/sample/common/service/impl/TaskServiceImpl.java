@@ -32,18 +32,31 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task findById(Long id) {
-        return taskMapper.findById(id);
+    public Task findByIdForUser(Long id, Long userId) {
+        Task task = taskMapper.findById(id); // 元々あるMapperのメソッドを呼ぶ
+        
+        // ★ここが鉄壁の防御！タスクが存在しない、またはタスクの所有者とログインIDが違ったら即エラー！
+        if (task == null || !task.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("対象のタスクにアクセスする権限がありません。");
+        }
+        return task;
     }
 
     @Override
-    public void update(Task task) {
+    public void updateForUser(Task task, Long userId) {
+        // 1. まず上のメソッドを使って、本当に本人のタスクかチェックする
+        Task current = findByIdForUser(task.getId(), userId);
+        
+        // 2. 画面から悪意あるuserIdが送られてきても大丈夫なように、サーバー側で本人のIDを上書きする（Mass Assignment対策）
+        task.setUserId(current.getUserId());
+        
         taskMapper.update(task);
     }
 
-    // ここで実際にMapperのdeleteを呼ぶ
     @Override
-    public void delete(Long id) {
+    public void deleteForUser(Long id, Long userId) {
+        // 所有者チェックをついでに行い、問題なければ削除する
+        findByIdForUser(id, userId);
         taskMapper.delete(id);
     }
 

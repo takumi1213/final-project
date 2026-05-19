@@ -14,14 +14,17 @@ public interface TaskService {
     // 新規登録する
     void save(Task task);
     
-    // 編集：IDから1件取得
-    Task findById(Long id);
-    
-    // 編集：更新実行
-    void update(Task task);
-    
-    // 追加：削除（論理削除）を実行する
-    void delete(Long id);
+	 // 旧：Task findById(Long id);
+	 // 新：ログインユーザーのIDも一緒に渡すようにする
+	 Task findByIdForUser(Long id, Long userId);
+	
+	 // 旧：void update(Task task);
+	 // 新：ログインユーザーのIDを渡して検証＆上書きできるようにする
+	 void updateForUser(Task task, Long userId);
+	
+	 // 旧：void delete(Long id);
+	 // 新：ログインユーザーのIDを渡して他人のタスクを消せないようにする
+	 void deleteForUser(Long id, Long userId);
 
     // --- 以下、必要に応じて残すメソッド ---
     List<Task> findAll();
