@@ -27,8 +27,8 @@ public class TaskController {
     @GetMapping("/tasks")
     public String list(@RequestParam(name = "page", defaultValue = "1") int page,
                        Model model, HttpSession session) {
+        // 認証チェックは Interceptor が行うので削除済み！
         Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) return "redirect:/login";
 
         int pageSize = 10;
         model.addAttribute("tasks", taskService.findPageByUserId(userId, page, pageSize));
@@ -41,7 +41,7 @@ public class TaskController {
     @GetMapping("/tasks/new")
     public String showNew(Model model) {
         model.addAttribute("task", new TaskForm());
-        return "tasks/new"; // ★修正：templates/tasks/new.html を指す
+        return "tasks/new";
     }
 
     // --- 新規登録（保存） ---
@@ -51,7 +51,7 @@ public class TaskController {
                          HttpSession session) {
         
         if (bindingResult.hasErrors()) {
-            return "tasks/new"; // ★修正
+            return "tasks/new";
         }
 
         Long userId = (Long) session.getAttribute("userId");
@@ -73,7 +73,7 @@ public class TaskController {
         form.setEndDate(task.getEndDate());
         
         model.addAttribute("task", form);
-        return "tasks/edit"; // ★修正：templates/tasks/edit.html を指す
+        return "tasks/edit";
     }
 
     // --- 編集実行（保存） ---
@@ -83,7 +83,7 @@ public class TaskController {
                          HttpSession session) {
         
         if (bindingResult.hasErrors()) {
-            return "tasks/edit"; // ★修正
+            return "tasks/edit";
         }
 
         Long userId = (Long) session.getAttribute("userId");
