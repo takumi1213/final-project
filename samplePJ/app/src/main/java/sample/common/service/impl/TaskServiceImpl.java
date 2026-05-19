@@ -2,27 +2,34 @@ package sample.common.service.impl;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus; // ★追加
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException; // ★追加：Spring標準のエラークラス
+import org.springframework.web.server.ResponseStatusException;
 import sample.common.dao.entity.Task;
 import sample.common.dao.mapper.TaskMapper;
 import sample.common.service.TaskService;
 import sample.thymeleaf.form.TaskForm;
 
 @Service
-@Transactional // ★P1-07：クラス全体にトランザクションをかける！
+@Transactional
 public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private TaskMapper taskMapper;
 
-    // ★P1-07：参照系メソッドには (readOnly = true) を設定！
+    // ★P1-09：ページ番号がどんな値でも絶対に落ちない「クランプ」処理を実装！
     @Override
     @Transactional(readOnly = true)
     public List<Task> findPageByUserId(Long userId, int page, int size) {
-        int offset = (page - 1) * size;
+        // 1. 最大ページ数を取得（最低でも1ページはある状態にする）
+        int totalPages = Math.max(1, getTotalPages(userId, size));
+        
+        // 2. pageを [1, totalPages] の範囲内に強制的に収める（クランプ）
+        int safePage = Math.min(Math.max(page, 1), totalPages);
+        
+        // 3. 安全なページ数から OFFSET を計算
+        int offset = (safePage - 1) * size;
         return taskMapper.findPageByUserId(userId, offset, size);
     }
 
@@ -33,7 +40,6 @@ public class TaskServiceImpl implements TaskService {
         return (int) Math.ceil((double) totalTasks / size);
     }
 
-    // 🛠️ 更新系メソッド
     @Override
     public void create(TaskForm form, Long userId) {
         Task task = new Task();
@@ -46,26 +52,21 @@ public class TaskServiceImpl implements TaskService {
         taskMapper.insert(task);
     }
 
-    // ★P1-08：存在しない場合は null を返さずに専用例外を投げるぜ！
     @Override
     @Transactional(readOnly = true)
     public Task findByIdForUser(Long id, Long userId) {
         Task task = taskMapper.findById(id);
         
-        // 🛠️ そもそもデータがDBに無かったら「404用エラー（自作例外）」を投げる！
         if (task == null) {
             throw new sample.common.exception.TaskNotFoundException(id);
         }
         
-        // 🛠️ データはあるけど、他人のタスクだったら「403用エラー（アクセス拒否）」を投げる！
         if (!task.getUserId().equals(userId)) {
-            // ★ライブラリ不要なSpring標準のResponseStatusExceptionで403(FORBIDDEN)をぶん投げる！
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "このタスクへのアクセス権限がありません。");
         }
         return task;
     }
 
-    // 🛠️ 更新系メソッド
     @Override
     public void updateForUser(TaskForm form, Long userId) {
         Task current = findByIdForUser(form.getId(), userId);
@@ -78,14 +79,12 @@ public class TaskServiceImpl implements TaskService {
         taskMapper.update(current);
     }
 
-    // 🛠️ 削除系メソッド
     @Override
     public void deleteForUser(Long id, Long userId) {
         findByIdForUser(id, userId);
         taskMapper.delete(id);
     }
 
-    // --- 古い互換性のための残し ---
     @Override
     public void save(Task task) { taskMapper.insert(task); }
     
