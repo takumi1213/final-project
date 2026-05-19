@@ -112,13 +112,18 @@
                     <td th:text="${task.endDate}">2025-07-11</td>
                     <td th:text="${task.createdAt}">2025-07-11 00:12</td>
                     <td th:text="${task.updatedAt}">2025-07-11 00:12</td>
-                    <td>
-                        <div class="action-btns">
-                            <a th:href="@{/tasks/edit/{id}(id=${task.id})}" class="btn-blue">編集</a>
-                            <a th:href="@{/tasks/delete/{id}(id=${task.id})}" class="btn-red" 
-                               onclick="return confirm('このタスクを削除してもよろしいですか？');">削除</a>
-                        </div>
-                    </td>
+					<td>
+					    <div class="action-btns">
+					        <a th:href="@{/tasks/edit/{id}(id=${task.id})}" class="btn-blue">編集</a>
+					        
+					        <form th:action="@{/tasks/delete}" method="post" style="display: inline;">
+					            <input type="hidden" name="id" th:value="${task.id}" />
+					            
+					            <button type="submit" class="btn-red" style="border: none; cursor: pointer;"
+					                    onclick="return confirm('このタスクを削除してもよろしいですか？');">削除</button>
+					        </form>
+					    </div>
+					</td>
                 </tr>
             </tbody>
         </table>

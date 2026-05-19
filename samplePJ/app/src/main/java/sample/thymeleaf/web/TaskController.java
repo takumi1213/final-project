@@ -35,7 +35,7 @@ public class TaskController {
      */
     @GetMapping("/tasks")
     public String list(
-            @RequestParam(name = "page", defaultValue = "1") int page, // ★追加：URLの?page=nを取得
+            @RequestParam(name = "page", defaultValue = "1") int page, 
             Model model, 
             HttpSession session) {
         
@@ -44,18 +44,13 @@ public class TaskController {
             return "redirect:/login";
         }
         
-        // 1ページあたりの表示件数
         int pageSize = 10;
-        
-        // ★修正：全件取得ではなく、ページ指定で取得する
         List<Task> tasks = taskService.findPageByUserId(loginUserId, page, pageSize); 
-        
-        // ★追加：全ページ数を計算する
         int totalPages = taskService.getTotalPages(loginUserId, pageSize);
         
         model.addAttribute("tasks", tasks);
-        model.addAttribute("currentPage", page); // 今何ページ目か
-        model.addAttribute("totalPages", totalPages); // 全部で何ページか
+        model.addAttribute("currentPage", page); 
+        model.addAttribute("totalPages", totalPages); 
         
         return "tasks/list";
     }
@@ -79,15 +74,13 @@ public class TaskController {
      */
     @GetMapping("/tasks/edit/{id}")
     public String edit(@PathVariable("id") Long id, Model model, HttpSession session) {
-        // ログインチェックと同時に、ログインユーザーのIDを取得
         Long loginUserId = (Long) session.getAttribute("userId");
         if (loginUserId == null) return "redirect:/login";
 
-        // ★修正：新しく作った「ユーザー検証付き」のメソッドを呼ぶ
-        // 他人のタスクIDを指定されたら、サービス層で自動的に例外（エラー）が飛ぶぜ！
+        // P0-02：他人のIDが来たらサービス層で403を投げる
         Task task = taskService.findByIdForUser(id, loginUserId);
         model.addAttribute("task", task);
-        return "tasks/edit"; // 編集用のHTML
+        return "tasks/edit"; 
     }
 
     /**
@@ -98,24 +91,21 @@ public class TaskController {
         Long loginUserId = (Long) session.getAttribute("userId");
         if (loginUserId == null) return "redirect:/login";
         
-        // ★修正：新しく作った「ユーザー検証付き」のメソッドを呼ぶ
-        // これで画面の書き換え攻撃（不正なuserIdの送りつけ）も完全に無効化するぜ
+        // P0-02：不正な書き換えを防止
         taskService.updateForUser(task, loginUserId);
         return "redirect:/tasks";
     }
     
     /**
-     * 削除を実行する（※GETメソッドの危険性はP0-03で直すから、まずはIDOR対策だけ！）
+     * 削除を実行する（★P0-03：GETからPOSTに変更、URLもすっきり！）
      */
-    @GetMapping("/tasks/delete/{id}")
-    public String delete(@PathVariable("id") Long id, HttpSession session) {
+    @PostMapping("/tasks/delete")
+    public String delete(@RequestParam("id") Long id, HttpSession session) {
         Long loginUserId = (Long) session.getAttribute("userId");
         if (loginUserId == null) return "redirect:/login";
         
-        // ★修正：新しく作った「ユーザー検証付き」のメソッドを呼ぶ
-        // これでURLの数字をテキトーに変えて他人のタスクを消す悪戯は不可能になるぜ
+        // 安全な削除処理を呼び出す
         taskService.deleteForUser(id, loginUserId);
-        return "redirect:/tasks"; // 削除後は一覧へ
+        return "redirect:/tasks"; 
     }
-    
 }
