@@ -48,7 +48,7 @@
 	    }
 
 	    .btn { 
-	        background: #82b769; /* 画像のイメージに近い色味 */
+	        background: #82b769; 
 	        color: white; 
 	        border: none; 
 	        padding: 12px 24px; 
@@ -56,7 +56,7 @@
 	        border-radius: 4px; 
 	        font-weight: bold;
 	        font-size: 16px;
-	        box-sizing: border-box; /* ★はみ出し防止 */
+	        box-sizing: border-box; 
 	    }
 	    
 	    .btn-cancel { 
@@ -68,7 +68,7 @@
 	        display: inline-block; 
 	        font-size: 16px;
 	        text-align: center;
-	        box-sizing: border-box; /* ★はみ出し防止 */
+	        box-sizing: border-box; 
 	    }
 
 	    /* スマホ対応：ボタンを縦に並べて幅を揃える */
@@ -80,7 +80,7 @@
 	            gap: 10px; 
 	        }
 	        .btn, .btn-cancel { 
-	            width: 100%; /* ★両方の幅を100%に統一 */
+	            width: 100%; 
 	            margin-left: 0; 
 	        }
 	    }
@@ -100,11 +100,6 @@
             <div class="form-group">
                 <label>内容</label>
                 <textarea th:field="*{content}"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>登録者</label>
-                <input type="text" th:field="*{name}">
             </div>
 
             <div class="form-group">

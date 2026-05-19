@@ -2,6 +2,7 @@ package sample.common.service;
 
 import java.util.List;
 import sample.common.dao.entity.Task;
+import sample.thymeleaf.form.TaskForm; // ★追加：Formクラスをインポート
 
 public interface TaskService {
     
@@ -11,22 +12,20 @@ public interface TaskService {
     // 全タスク数から、最大で何ページあるかを計算して返す
     int getTotalPages(Long userId, int size);
 
-    // 新規登録する
-    void save(Task task);
+    // ★P1-06：新規登録する（引数を TaskForm に変更した新メソッド）
+    void create(TaskForm form, Long userId);
     
-	 // 旧：Task findById(Long id);
-	 // 新：ログインユーザーのIDも一緒に渡すようにする
-	 Task findByIdForUser(Long id, Long userId);
+    // ログインユーザーのIDも一緒に渡すようにする
+    Task findByIdForUser(Long id, Long userId);
 	
-	 // 旧：void update(Task task);
-	 // 新：ログインユーザーのIDを渡して検証＆上書きできるようにする
-	 void updateForUser(Task task, Long userId);
+    // ★P1-06：更新を実行する（引数を TaskForm に変更した新メソッド）
+    void updateForUser(TaskForm form, Long userId);
 	
-	 // 旧：void delete(Long id);
-	 // 新：ログインユーザーのIDを渡して他人のタスクを消せないようにする
-	 void deleteForUser(Long id, Long userId);
+    // ログインユーザーのIDを渡して他人のタスクを消せないようにする
+    void deleteForUser(Long id, Long userId);
 
-    // --- 以下、必要に応じて残すメソッド ---
+    // --- 古い互換性のために残すメソッド（必要に応じて） ---
+    void save(Task task);
     List<Task> findAll();
     List<Task> findByUserId(Long userId);
 }
